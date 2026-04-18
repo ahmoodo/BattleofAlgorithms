@@ -30,7 +30,7 @@ Run the base Connect 4 code:
 1) pip install numpy
 2) pip install pygame
 3) cd "(insert your file path here)"
-4) python3 coonect4_ai_no_comments.py
+4) python3 connect4_ai_no_comments.py
 
 Run the base Battleship code:
 1) cd "(insert your file path here)"
