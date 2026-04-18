@@ -2,29 +2,29 @@
 Bitminers
 
 Connect 4 plan:
-Have a functioning AI vs AI program running MiniMax with Alpha-Beta pruning.
-Have the code record run time (time it takes to think per move).
-Have the code be able to track Player 1/Player 2 Win%
-Create a Monte Carlo Tree Search algorithm.
-Have the AI run at depths 1, 3, 5, and 7 (code currently runs at 5)
-Run a tournament of the each AI depth going against each other.
-A single match should be something like running depth 1 vs 3 for 100 or so rounds
-Report the wins (Player 1 won 40/100, Player 2 won 60/100).
-Report average turn time (Player 1 takes an average of 1.2s to make a move).
-Run these matches till we feel like we have satisfactory data.
+1) Have a functioning AI vs AI program running MiniMax with Alpha-Beta pruning.
+2) Have the code record run time (time it takes to think per move).
+3) Have the code be able to track Player 1/Player 2 Win%
+4) Create a Monte Carlo Tree Search algorithm.
+5) Have the AI run at depths 1, 3, 5, and 7 (code currently runs at 5)
+6) Run a tournament of the each AI depth going against each other.
+7) A single match should be something like running depth 1 vs 3 for 100 or so rounds
+8) Report the wins (Player 1 won 40/100, Player 2 won 60/100).
+9) Report average turn time (Player 1 takes an average of 1.2s to make a move).
+10) Run these matches till we feel like we have satisfactory data.
 
 Objective:
-Find at what MiniMax depth does the win percentage vs turn time starts to plateau.
-Run MiniMax vs Mante Carlo.
-For example, The depth 5 wins 80/100 with average 3s turn time, and depth 7 wins 85/100 with average of 6s turn time.
-Only 5 more wins with double the turn time may not be worth it.
+1) Find at what MiniMax depth does the win percentage vs turn time starts to plateau.
+2) Run MiniMax vs Mante Carlo.
+3) For example, The depth 5 wins 80/100 with average 3s turn time, and depth 7 wins 85/100 with average of 6s turn time.
+4) Only 5 more wins with double the turn time may not be worth it.
 
 Battleship Plan:
-Create a basic Reinforced Learning (RL) AI
-Have the RL AI train/go against the Standard Population Distribution (SPD) AI
+1) Create a basic Reinforced Learning (RL) AI
+2) Have the RL AI train/go against the Standard Population Distribution (SPD) AI
 
 Objective:
-Train the RL AI to beat the SPD AI
+1) Train the RL AI to beat the SPD AI
 
 Run the base Connect 4 code:
 1) pip install numpy
