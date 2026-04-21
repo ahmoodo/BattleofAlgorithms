@@ -1,6 +1,13 @@
 # BattleofAlgorithms
 Bitminers
 
+Roles:
+Make AI vs AI code: Ahmad
+Run simulations: Open
+Run simulations: Open
+Make Monte Carlo Tree Search Algorithm: Open
+Make Reinforcement Learning AI for Battleship: Nathan
+
 Connect 4 plan:
 1) Have a functioning AI vs AI program running MiniMax with Alpha-Beta pruning.
 2) Have the code record run time (time it takes to think per move).
