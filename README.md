@@ -42,9 +42,13 @@ Run the base Connect 4 code:
 Run the base Battleship code:
 1) cd "(insert your file path here)"
 2) python3 -m venv .ven
-3) .\.venv\Scripts\activate
-4) pip install -r requirements.txt
-5) python3 main.py
+3) Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+4) .venv\Scripts\activate
+5) pip install -r requirements.txt
+6) If your powershell now shows ">>>" instead of your file path, enter "exit()"
+7) python3 -c "import torch; print(torch.__version__)" (this checks to make sure torch is installed correctly)
+8) python3 main.py (runs the basic main game)
+9) mkdir -p output logs summaries && python3 BattleshipRLEnv.py (run reinforcement learning)
 
 References:
 - https://github.com/JTexpo/Python_Projects/tree/main/Algorithm_AI/SPD_Battleship (Battleship AI)
