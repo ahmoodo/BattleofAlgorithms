@@ -4,8 +4,8 @@ Bitminers
 Roles:
 - Make AI vs AI code: Ahmad
 - Run simulations: Sophie
-- Run simulations: Open
-- Make Monte Carlo Tree Search Algorithm: Open
+- Run simulations: Dianelsa
+- Make Monte Carlo Tree Search Algorithm: Raice
 - Make Reinforcement Learning AI for Battleship: Nathan
 
 Connect 4 plan:
