@@ -53,6 +53,7 @@ Run the base Battleship code (Commands are for Windows Powershell):
 References:
 - https://github.com/JTexpo/Python_Projects/tree/main/Algorithm_AI/SPD_Battleship (Battleship AI)
 - https://www.youtube.com/watch?v=LE315dE81Bo&t=1s (Battleship AI demonstration)
+- https://github.com/Bloodman1941/Battleship_RL_AI/tree/main (Battleship RL AI)
 - https://github.com/zakuraevs/connect4-ai (Connect 4 AI)
 
 
