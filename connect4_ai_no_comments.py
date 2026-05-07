@@ -2,6 +2,7 @@ import numpy as np
 import pygame
 import sys
 import math
+import time
 from threading import Timer
 import random
 
@@ -57,17 +58,15 @@ def winning_move(board, piece):
             if board[r][c] == piece and board[r-1][c-1] == piece and board[r-2][c-2] == piece and board[r-3][c-3] == piece:
                 return True
 
-def draw_board(board):
+def draw_board(board, screen, SQUARESIZE, circle_radius):
     for c in range(COLS):
         for r in range(ROWS):
             pygame.draw.rect(screen, BLUE, (c * SQUARESIZE, r * SQUARESIZE + SQUARESIZE, SQUARESIZE, SQUARESIZE))
             if board[r][c] == 0:
                 pygame.draw.circle(screen, BLACK, (int(c * SQUARESIZE + SQUARESIZE/2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE/2)), circle_radius)
             elif board[r][c] == 1:
-                # RED = AI1 (Minimax)
                 pygame.draw.circle(screen, RED, (int(c * SQUARESIZE + SQUARESIZE/2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE/2)), circle_radius)
             else:
-                # YELLOW = AI2 (MCTS)
                 pygame.draw.circle(screen, YELLOW, (int(c * SQUARESIZE + SQUARESIZE/2), int(r * SQUARESIZE + SQUARESIZE + SQUARESIZE/2)), circle_radius)
 
     pygame.display.update()
@@ -215,7 +214,7 @@ class MCTSNode:
 
     def rollout(self):
         current_board = self.board.copy()
-        current_piece = self.piece
+        current_piece = AI1_PIECE if self.piece == AI2_PIECE else AI2_PIECE
         while not is_terminal_node(current_board):
             valid = get_valid_locations(current_board)
             col = random.choice(valid)
@@ -236,7 +235,7 @@ class MCTSNode:
 
 
 def mcts_move(board, iterations=500):
-    root = MCTSNode(board.copy(), AI2_PIECE)
+    root = MCTSNode(board.copy(), AI1_PIECE)
     for _ in range(iterations):
         node = root
         while node.is_fully_expanded() and node.children:
@@ -251,74 +250,183 @@ def mcts_move(board, iterations=500):
     return best.move
 
 
-def end_game():
-    global game_over
-    game_over = True
-    print(game_over)
+def play_game(headless=False):
+    """
+    Play a single game between AI1 (minimax) and AI2 (MCTS).
+    Returns a dict with the game result and per-move decision times.
+    """
+    board = create_board()
+    turn = random.randint(AI1_TURN, AI2_TURN)
+    starter = turn 
 
+    ai1_times = []
+    ai2_times = []
+    winner = None  
+   
+    screen = None
+    SQUARESIZE = 100
+    circle_radius = int(SQUARESIZE / 2 - 5)
+    my_font = None
 
-board = create_board()
-
-game_over = False
-not_over = True
-turn = random.randint(AI1_TURN, AI2_TURN)
-
-pygame.init()
-
-SQUARESIZE = 100
-width = COLS * SQUARESIZE
-height = (ROWS + 1) * SQUARESIZE
-circle_radius = int(SQUARESIZE/2 - 5)
-size = (width, height)
-screen = pygame.display.set_mode(size)
-
-my_font = pygame.font.SysFont("monospace", 75)
-
-pygame.display.set_caption("Connect 4: Minimax vs MCTS")
-draw_board(board)
-pygame.display.update()
-pygame.time.wait(1000)
-
-while not game_over:
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-
-    if not_over:
-        pygame.time.wait(400)
-
-        if turn == AI1_TURN:
-            col, _ = minimax(board, 5, -math.inf, math.inf, True)
-            piece = AI1_PIECE
-            win_msg = "AI 1 WINS!"
-            win_color = RED
-        else:
-            col = mcts_move(board, iterations=500)
-            piece = AI2_PIECE
-            win_msg = "AI 2 WINS!"
-            win_color = YELLOW
-
-        if col is not None and is_valid_location(board, col):
-            row = get_next_open_row(board, col)
-            drop_piece(board, row, col, piece)
-
-            if winning_move(board, piece):
-                print(win_msg)
-                label = my_font.render(win_msg, 1, win_color)
-                screen.blit(label, (40, 10))
-                not_over = False
-                t = Timer(3.0, end_game)
-                t.start()
-            elif len(get_valid_locations(board)) == 0:
-                print("DRAW!")
-                label = my_font.render("DRAW!", 1, BLUE)
-                screen.blit(label, (40, 10))
-                not_over = False
-                t = Timer(3.0, end_game)
-                t.start()
-
-            draw_board(board)
-            turn = (turn + 1) % 2
-
+    if not headless:
+        pygame.init()
+        width = COLS * SQUARESIZE
+        height = (ROWS + 1) * SQUARESIZE
+        size = (width, height)
+        screen = pygame.display.set_mode(size)
+        my_font = pygame.font.SysFont("monospace", 75)
+        pygame.display.set_caption("Connect 4: Minimax vs MCTS")
+        draw_board(board, screen, SQUARESIZE, circle_radius)
         pygame.display.update()
+        pygame.time.wait(1000)
+
+    game_over = False
+    not_over = True
+
+    while not game_over:
+        if not headless:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+        if not_over:
+            if not headless:
+                pygame.time.wait(400)
+
+            start = time.perf_counter()
+            if turn == AI1_TURN:
+                col, _ = minimax(board, 5, -math.inf, math.inf, True)
+                piece = AI1_PIECE
+                win_msg = "AI 1 WINS!"
+                win_color = RED
+            else:
+                col = mcts_move(board, iterations=500)
+                #tesing at:
+                # depth - iterations
+                # 1 - 500
+                # 1 - 2000
+                # 3 - 2000
+                # 3 - 5000
+                # 5 - 5000
+                # 5 - 15000
+
+                piece = AI2_PIECE
+                win_msg = "AI 2 WINS!"
+                win_color = YELLOW
+            elapsed = time.perf_counter() - start
+
+            if turn == AI1_TURN:
+                ai1_times.append(elapsed)
+            else:
+                ai2_times.append(elapsed)
+
+            if col is not None and is_valid_location(board, col):
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, piece)
+
+                if winning_move(board, piece):
+                    winner = piece
+                    if not headless:
+                        print(win_msg)
+                        label = my_font.render(win_msg, 1, win_color)
+                        screen.blit(label, (40, 10))
+                    not_over = False
+                elif len(get_valid_locations(board)) == 0:
+                    winner = 0  
+                    if not headless:
+                        print("DRAW!")
+                        label = my_font.render("DRAW!", 1, BLUE)
+                        screen.blit(label, (40, 10))
+                    not_over = False
+
+                if not headless:
+                    draw_board(board, screen, SQUARESIZE, circle_radius)
+                turn = (turn + 1) % 2
+
+            if not headless:
+                pygame.display.update()
+
+        if not not_over:
+            if headless:
+                game_over = True
+            else:
+                pygame.time.wait(3000)
+                game_over = True
+
+    if not headless:
+        pygame.quit()
+
+    return {
+        "winner": winner,
+        "ai1_times": ai1_times,
+        "ai2_times": ai2_times,
+        "starter": starter,
+    }
+
+
+def run_batch(num_games):
+    """Run many games headless and print aggregate stats."""
+    ai1_wins = 0
+    ai2_wins = 0
+    draws = 0
+    all_ai1_times = []
+    all_ai2_times = []
+    ai1_starts = 0
+    ai2_starts = 0
+
+    print(f"Running {num_games} games (headless)...")
+    start_time = time.perf_counter()
+
+    for i in range(num_games):
+        result = play_game(headless=True)
+        if result["winner"] == AI1_PIECE:
+            ai1_wins += 1
+        elif result["winner"] == AI2_PIECE:
+            ai2_wins += 1
+        else:
+            draws += 1
+
+        all_ai1_times.extend(result["ai1_times"])
+        all_ai2_times.extend(result["ai2_times"])
+
+        if result["starter"] == AI1_TURN:
+            ai1_starts += 1
+        else:
+            ai2_starts += 1
+
+        print(f"  Game {i+1}/{num_games} done. Winner: "
+              f"{'AI1' if result['winner'] == AI1_PIECE else ('AI2' if result['winner'] == AI2_PIECE else 'Draw')}")
+
+    total_time = time.perf_counter() - start_time
+
+    avg_ai1 = sum(all_ai1_times) / len(all_ai1_times) if all_ai1_times else 0.0
+    avg_ai2 = sum(all_ai2_times) / len(all_ai2_times) if all_ai2_times else 0.0
+
+    print()
+    print("=" * 50)
+    print(f"RESULTS OVER {num_games} GAMES")
+    print("=" * 50)
+    print(f"AI1 (Minimax) wins: {ai1_wins}")
+    print(f"AI2 (MCTS)    wins: {ai2_wins}")
+    print(f"Draws:              {draws}")
+    print()
+    print(f"AI1 avg decision time: {avg_ai1:.4f} s  ({len(all_ai1_times)} moves)")
+    print(f"AI2 avg decision time: {avg_ai2:.4f} s  ({len(all_ai2_times)} moves)")
+    print()
+    print(f"AI1 went first: {ai1_starts} times")
+    print(f"AI2 went first: {ai2_starts} times")
+    print(f"Total batch wall time: {total_time:.2f} s")
+    print("=" * 50)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        try:
+            n = int(sys.argv[1])
+        except ValueError:
+            print(f"Usage: python {sys.argv[0]} [num_games]")
+            sys.exit(1)
+        run_batch(n)
+    else:
+        play_game(headless=False)
